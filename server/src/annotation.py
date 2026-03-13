@@ -127,6 +127,7 @@ from os.path import splitext, dirname, isfile, isdir, exists
 from re import compile as re_compile
 from re import match as re_match
 from time import time
+import sys
 
 
 try:
@@ -358,12 +359,8 @@ class SpanOffsetOverlapError(AnnotationError):
         return json_dic
 
 
-# Open function that enforces strict, utf-8, and universal newlines for reading
 # TODO: Could have another wrapping layer raising an appropriate AnnotationError
-def open_textfile(filename, mode='rU'):
-    # enforce universal newline support ('U') in read modes
-    if len(mode) != 0 and mode[0] == 'r' and 'U' not in mode:
-        mode = mode + 'U'
+def open_textfile(filename, mode='r'):
     return codecs_open(filename, mode, encoding='utf8', errors='strict')
 
 
@@ -585,10 +582,14 @@ class Annotations(object):
         for e_ann in self.get_events():
             try:
                 tr_ann = self.get_ann_by_id(e_ann.trigger)
+                sys.stderr.write(f"EVENT TYPE: {e_ann.type}\n")
+                sys.stderr.write(f"TRIGGER TYPE: {tr_ann}\n")
+                sys.stderr.write(f"TRIGGER CLASS: {type(tr_ann)}\n")
 
                 # If the annotation is not text-bound or of different type
                 if (not isinstance(tr_ann, TextBoundAnnotation) or
-                        tr_ann.type != e_ann.type):
+                    tr_ann.type.strip() != e_ann.type.strip()):
+                        # tr_ann.type != e_ann.type):
                     raise EventWithNonTriggerError(e_ann, tr_ann)
             except AnnotationNotFoundError:
                 raise EventWithoutTriggerError(e_ann)

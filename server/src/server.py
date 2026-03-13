@@ -223,8 +223,9 @@ def _safe_serve(params, client_ip, client_hostname, cookie_data):
         cookie_hdrs = get_session().cookie.hdrs()
         close_session()
     except SessionStoreError:
-        Messager.error(
-            "Failed to store cookie (missing write permission to brat work directory)?", -1)
+        pass
+        # Messager.error(
+        #     "Failed to store cookie (missing write permission to brat work directory)?", -1)
     except NoSessionError:
         cookie_hdrs = None
 
